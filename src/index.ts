@@ -3,3 +3,4 @@ export * from './server';
 export * from './helpers';
 export * from './messageTypes';
 export * from './protocols';
+export * from './graphiql-fetcher';

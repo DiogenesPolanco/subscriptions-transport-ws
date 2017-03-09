@@ -22,6 +22,7 @@ import isString = require('lodash.isstring');
 import isObject = require('lodash.isobject');
 
 export * from './helpers';
+export * from './graphiql-fetcher';
 
 export interface SubscriptionOptions {
   query: string;
