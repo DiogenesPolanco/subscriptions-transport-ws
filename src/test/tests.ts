@@ -33,6 +33,8 @@ import {
   GRAPHQL_SUBSCRIPTIONS,
 } from '../protocols';
 
+import { graphQLFetcher } from '../graphiql-fetcher';
+
 import {createServer, IncomingMessage, ServerResponse} from 'http';
 import {SubscriptionServer} from '../server';
 import {SubscriptionClient} from '../client';
@@ -1266,5 +1268,73 @@ describe('Server', function () {
         }
       }
     };
+  });
+});
+
+describe('GraphiQL Fetcher', () => {
+  let subscriptionsClient = {
+    subscribe: sinon.spy(),
+    unsubscribe: sinon.spy(),
+  };
+
+  let fallbackFetcher = sinon.spy();
+
+  let fetcher: Function;
+
+  beforeEach(() => {
+    subscriptionsClient.subscribe.reset();
+    subscriptionsClient.unsubscribe.reset();
+    fallbackFetcher.reset();
+    fetcher = graphQLFetcher(<any>subscriptionsClient, fallbackFetcher);
+  });
+
+  it('should use subscriptions fetcher when using with named operation', () => {
+    const ret = fetcher({
+      query: 'subscription commentAdded { field }',
+      operationName: 'commentAdded',
+    });
+
+    expect(ret.subscribe).not.to.equals(undefined);
+  });
+
+  it('should use subscriptions fetcher when using with named operation with fragments', () => {
+    const ret = fetcher({
+      query: 'fragment f { field } subscription commentAdded { ...f }',
+      operationName: 'commentAdded',
+    });
+
+    expect(ret.subscribe).not.to.equals(undefined);
+  });
+
+  it('should use subscriptions fetcher when using with operation with fragments', () => {
+    const ret = fetcher({
+      query: 'fragment f { field } subscription { ...f }',
+    });
+
+    expect(ret.subscribe).not.to.equals(undefined);
+  });
+
+  it('should use subscriptions fetcher when using with operation', () => {
+    const ret = fetcher({
+      query: 'subscription { ...f }',
+    });
+
+    expect(ret.subscribe).not.to.equals(undefined);
+  });
+
+  it('should use fallback fetcher when using query', () => {
+    fetcher({
+      query: 'query { field }',
+    });
+
+    assert(fallbackFetcher.calledOnce);
+  });
+
+  it('should use fallback fetcher when using mutations', () => {
+    fetcher({
+      query: 'mutation { field }',
+    });
+
+    assert(fallbackFetcher.calledOnce);
   });
 });

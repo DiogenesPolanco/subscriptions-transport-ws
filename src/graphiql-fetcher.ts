@@ -1,5 +1,17 @@
 import { SubscriptionClient } from './client';
 
+const hasSubscriptionOperation = (graphQlParams: any) => {
+  const query = graphQlParams.query;
+  const operationName = graphQlParams.operationName;
+
+  if (operationName && operationName !== '') {
+    return query.includes(`subscription ${operationName}`);
+  }
+
+  return query.includes('subscription {') ||
+    query.includes('subscription{');
+};
+
 export const graphQLFetcher = (subscriptionsClient: SubscriptionClient, fallbackFetcher: Function) => {
   let activeSubscriptionId: number | null = null;
 
@@ -8,7 +20,7 @@ export const graphQLFetcher = (subscriptionsClient: SubscriptionClient, fallback
       subscriptionsClient.unsubscribe(activeSubscriptionId);
     }
 
-    if (subscriptionsClient && graphQLParams.query.startsWith('subscription')) {
+    if (subscriptionsClient && hasSubscriptionOperation(graphQLParams)) {
       return {
         subscribe: (observer: { error: Function, next: Function }) => {
           observer.next('Your subscription data will appear here after server publication!');
