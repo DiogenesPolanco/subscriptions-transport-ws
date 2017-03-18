@@ -1,15 +1,21 @@
+import { parse, OperationDefinitionNode } from 'graphql';
 import { SubscriptionClient } from './client';
 
 const hasSubscriptionOperation = (graphQlParams: any) => {
   const query = graphQlParams.query;
-  const operationName = graphQlParams.operationName;
+  const doc = parse(query);
 
-  if (operationName && operationName !== '') {
-    return query.includes(`subscription ${operationName}`);
+  for (let definition of doc.definitions) {
+    if (definition.kind === 'OperationDefinition') {
+      const operation = (definition as OperationDefinitionNode).operation;
+
+      if (operation === 'subscription') {
+        return true;
+      }
+    }
   }
 
-  return query.includes('subscription {') ||
-    query.includes('subscription{');
+  return false;
 };
 
 export const graphQLFetcher = (subscriptionsClient: SubscriptionClient, fallbackFetcher: Function) => {

@@ -1299,7 +1299,7 @@ describe('GraphiQL Fetcher', () => {
 
   it('should use subscriptions fetcher when using with named operation with fragments', () => {
     const ret = fetcher({
-      query: 'fragment f { field } subscription commentAdded { ...f }',
+      query: 'fragment f on MyType { field } subscription commentAdded { ...f }',
       operationName: 'commentAdded',
     });
 
@@ -1308,7 +1308,7 @@ describe('GraphiQL Fetcher', () => {
 
   it('should use subscriptions fetcher when using with operation with fragments', () => {
     const ret = fetcher({
-      query: 'fragment f { field } subscription { ...f }',
+      query: 'fragment f on MyType { field } subscription { ...f }',
     });
 
     expect(ret.subscribe).not.to.equals(undefined);
@@ -1316,7 +1316,7 @@ describe('GraphiQL Fetcher', () => {
 
   it('should use subscriptions fetcher when using with operation', () => {
     const ret = fetcher({
-      query: 'subscription { ...f }',
+      query: 'subscription { field }',
     });
 
     expect(ret.subscribe).not.to.equals(undefined);

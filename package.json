@@ -12,6 +12,7 @@
     "@types/ws": "0.0.38",
     "backo2": "^1.0.2",
     "eventemitter3": "^2.0.2",
+    "graphql": "^0.9.1",
     "graphql-subscriptions": "^0.3.0",
     "graphql-tag": "^1.2.4",
     "lodash.isobject": "^3.0.2",
